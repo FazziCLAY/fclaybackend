@@ -12,6 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
+
 public class PersonStatus {
     @Nullable
     private PlaybackDto headphones;

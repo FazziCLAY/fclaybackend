@@ -4,6 +4,7 @@ import com.fazziclay.fclaybackend.HttpException;
 import com.fazziclay.fclaybackend.config.DevicesConfig;
 import com.fazziclay.fclaybackend.config.TelegramBotConfig;
 import com.fazziclay.fclaybackend.person.status.autopost.IAutoPost;
+import com.fazziclay.fclaybackend.person.status.autopost.StatisticAutoPost;
 import com.fazziclay.fclaybackend.person.status.autopost.ovk.OVKApiAutoPost;
 import com.fazziclay.fclaybackend.person.status.autopost.telegram.TelegramBotAutoPost;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
@@ -24,6 +25,7 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class PersonStatusService {
+    private final Statistic statistic = new Statistic();
     private final PersonStatus status = new PersonStatus();
     private final List<UserHandler> users = new ArrayList<>();
     private final Timer timer = new Timer();
@@ -36,6 +38,7 @@ public class PersonStatusService {
         this.telegramBotConfig = telegramBotConfig;
         this.autoPosts.add(new TelegramBotAutoPost(telegramBotConfig));
         this.autoPosts.add(new OVKApiAutoPost("ovkisser.fun", telegramBotConfig.getOvkisserToken()));
+        this.autoPosts.add(new StatisticAutoPost(statistic));
 
         devicesConfig.getAuthorizationTokens().forEach((name, token) -> {
             UserHandler user = new UserHandler(name, token, name.startsWith("mobile"));

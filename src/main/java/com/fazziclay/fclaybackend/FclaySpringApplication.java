@@ -1,5 +1,6 @@
 package com.fazziclay.fclaybackend;
 
+import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import com.google.gson.JsonObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @SpringBootApplication
 @RestController
 public class FclaySpringApplication {
+	private static final PlaybackDto EMPTY_PATCH = new PlaybackDto(null, null, null, null, null, null, null, null);
 	private final AtomicLong counter = new AtomicLong();
 
 	public static void main(String[] args) {
@@ -35,4 +37,7 @@ public class FclaySpringApplication {
 		return new ResponseEntity<>(map, HttpStatusCode.valueOf(200));
 	}
 
+	public static PlaybackDto clone(PlaybackDto playbackDto) {
+		return playbackDto.newWithPatch(EMPTY_PATCH);
+	}
 }

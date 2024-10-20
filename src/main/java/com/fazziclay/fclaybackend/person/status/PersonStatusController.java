@@ -35,6 +35,10 @@ public class PersonStatusController {
         }, HttpStatus.OK);
     }
 
+    @GetMapping("/chartjs")
+    public ResponseEntity<?> chartjs() {
+        return handle(() -> service.getStatistic().asJsonObject(), HttpStatus.OK);
+    }
 
     @PutMapping("/headphones")
     public ResponseEntity<?> put(@RequestHeader("Authorization") String authorization, @RequestBody PlaybackDto status) {

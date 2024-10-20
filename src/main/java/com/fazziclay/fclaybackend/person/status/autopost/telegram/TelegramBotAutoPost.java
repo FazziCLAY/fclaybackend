@@ -4,8 +4,7 @@ import com.fazziclay.fclaybackend.Logger;
 import com.fazziclay.fclaybackend.config.TelegramBotConfig;
 import com.fazziclay.fclaybackend.person.status.CuteTextPlayerGenerator;
 import com.fazziclay.fclaybackend.person.status.PersonStatus;
-import com.fazziclay.fclaybackend.person.status.SongInfo;
-import com.fazziclay.fclaybackend.person.status.autopost.IAutoPost;
+import com.fazziclay.fclaybackend.person.status.autopost.AutoPostFilter;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
@@ -16,20 +15,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.json.JsonObject;
 import java.util.Map;
-import java.util.Objects;
 
-public class TelegramBotAutoPost implements IAutoPost {
+public class TelegramBotAutoPost extends AutoPostFilter {
     private final TelegramBotApi api;
     private final String token;
     private final String chatId;
     private final Map<String, String> emojis;
     private TelegramBotConfig cfg;
-
-    private SongInfo chatHead = null;
-    private long chatHeadActualAt;
-
-    private SongInfo chatHeadWouldBe = null;
-    private long chatHeadWouldBeSetAt;
 
     public TelegramBotAutoPost(String token, String chatId, Map<String, String> emojis) {
         this.token = token;
@@ -48,34 +40,7 @@ public class TelegramBotAutoPost implements IAutoPost {
         cfg = config;
     }
 
-    /**
-     * Post to channel sound
-     */
-    @Override
-    public void postPersonStatus(@NotNull PersonStatus status) {
-        PlaybackDto headphones = status.getHeadphones();
-        SongInfo songInfo = SongInfo.create(headphones);
-
-        if (Objects.equals(songInfo, chatHead)) {
-            chatHeadActualAt = System.currentTimeMillis();
-
-        } else {
-            if (System.currentTimeMillis() - chatHeadActualAt > 5000 && (System.currentTimeMillis() - chatHeadWouldBeSetAt > 3000)) {
-                sendMessageAbout(status);
-                chatHead = songInfo;
-                chatHeadActualAt = System.currentTimeMillis();
-
-            } else {
-                if (!Objects.equals(chatHeadWouldBe, songInfo)) {
-                    chatHeadWouldBe = songInfo;
-                    chatHeadWouldBeSetAt = System.currentTimeMillis();
-                }
-            }
-
-        }
-    }
-
-    private void sendMessageAbout(PersonStatus status) {
+    public void sendMessageAbout(PersonStatus status) {
         PlaybackDto playback = status.getHeadphones();
         if (playback == null) {
             if (cfg.silenceMsg != null) {
