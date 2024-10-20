@@ -4,6 +4,7 @@ import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import com.google.gson.JsonObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 @SpringBootApplication
 @RestController
@@ -39,5 +41,23 @@ public class FclaySpringApplication {
 
 	public static PlaybackDto clone(PlaybackDto playbackDto) {
 		return playbackDto.newWithPatch(EMPTY_PATCH);
+	}
+
+	public static <T> ResponseEntity<?> handle(Supplier<T> supplier, HttpStatus success) {
+		try {
+			return new ResponseEntity<>(supplier.get(), success);
+
+		} catch (Throwable throwable) {
+			HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+			if (throwable instanceof HttpException httpException) {
+				httpStatus = httpException.getCode();
+			}
+			JsonObject errorObject = new JsonObject();
+			errorObject.addProperty("error", true);
+			errorObject.addProperty("errorText", throwable.toString());
+			errorObject.addProperty("timestamp", System.currentTimeMillis());
+			throwable.printStackTrace();
+			return new ResponseEntity<>(errorObject, httpStatus);
+		}
 	}
 }

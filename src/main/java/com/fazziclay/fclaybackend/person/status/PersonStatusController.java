@@ -1,9 +1,8 @@
 package com.fazziclay.fclaybackend.person.status;
 
-import com.fazziclay.fclaybackend.HttpException;
+import com.fazziclay.fclaybackend.FclaySpringApplication;
 import com.fazziclay.fclaybackend.Logger;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
-import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,20 +58,6 @@ public class PersonStatusController {
     }
 
     private <T> ResponseEntity<?> handle(Supplier<T> supplier, HttpStatus success) {
-        try {
-            return new ResponseEntity<>(supplier.get(), success);
-
-        } catch (Throwable throwable) {
-            HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            if (throwable instanceof HttpException httpException) {
-                httpStatus = httpException.getCode();
-            }
-            JsonObject errorObject = new JsonObject();
-            errorObject.addProperty("error", true);
-            errorObject.addProperty("errorText", throwable.toString());
-            errorObject.addProperty("timestamp", System.currentTimeMillis());
-            throwable.printStackTrace();
-            return new ResponseEntity<>(errorObject, httpStatus);
-        }
+        return FclaySpringApplication.handle(supplier, success);
     }
 }
