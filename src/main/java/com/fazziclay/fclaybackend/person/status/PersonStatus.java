@@ -52,7 +52,7 @@ public class PersonStatus {
                 long overdue = System.currentTimeMillis() - originalHeadphonesTime;
                 long nw = position + overdue;
                 actual = originalHeadphones.newWithPatch(new PlaybackDto(null, null, null, null, null, nw, null, null));
-                Logger.debug("actualizePersonStatus f*** math check: pos=" + position + "; overdue=" + overdue + "; nw=" + nw);
+                //Logger.debug("actualizePersonStatus f*** math check: pos=" + position + "; overdue=" + overdue + "; nw=" + nw);
             }
         }
 
