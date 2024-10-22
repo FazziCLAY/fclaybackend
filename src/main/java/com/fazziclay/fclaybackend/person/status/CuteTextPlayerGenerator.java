@@ -12,7 +12,7 @@ public class CuteTextPlayerGenerator {
 
         StringBuilder msg = new StringBuilder();
         if (duration != null && position != null) {
-            msg.append(Util.time(position)).append(" ─────────── ").append(Util.time(duration)).append("\n");
+            msg.append(Util.time(position)).append(" ──────── ").append(Util.time(duration)).append("\n");
         }
         msg.append(emoji).append(" ").append(playback.getTitle()).append("\n");
         msg.append(" ").append(" ").append(playback.getArtist()).append("\n");

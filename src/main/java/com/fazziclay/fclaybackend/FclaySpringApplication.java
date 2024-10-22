@@ -1,7 +1,10 @@
 package com.fazziclay.fclaybackend;
 
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,9 @@ import java.util.function.Supplier;
 public class FclaySpringApplication {
 	private static final PlaybackDto EMPTY_PATCH = new PlaybackDto(null, null, null, null, null, null, null, null);
 	private final AtomicLong counter = new AtomicLong();
+	private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	@Autowired
+	private FclayConfig config;
 
 	public static void main(String[] args) {
 		System.out.println("Started!");
@@ -48,16 +54,22 @@ public class FclaySpringApplication {
 			return new ResponseEntity<>(supplier.get(), success);
 
 		} catch (Throwable throwable) {
+			throwable.printStackTrace();
 			HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 			if (throwable instanceof HttpException httpException) {
 				httpStatus = httpException.getCode();
 			}
-			JsonObject errorObject = new JsonObject();
-			errorObject.addProperty("error", true);
-			errorObject.addProperty("errorText", throwable.toString());
-			errorObject.addProperty("timestamp", System.currentTimeMillis());
-			throwable.printStackTrace();
-			return new ResponseEntity<>(errorObject, httpStatus);
+			JsonObject response = new JsonObject();
+
+			JsonObject error = new JsonObject();
+			error.addProperty("text", "An error occurred");
+			error.addProperty("exception", throwable.toString());
+			error.addProperty("httpErrorCode", httpStatus.value());
+			error.addProperty("httpErrorPhrase", httpStatus.getReasonPhrase());
+			error.addProperty("date", String.valueOf(new Date()));
+
+			response.add("error", error);
+			return new ResponseEntity<>(response, httpStatus);
 		}
 	}
 }

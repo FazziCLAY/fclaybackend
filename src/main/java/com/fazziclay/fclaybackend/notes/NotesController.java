@@ -1,6 +1,7 @@
 package com.fazziclay.fclaybackend.notes;
 
 import com.fazziclay.fclaybackend.FclaySpringApplication;
+import com.fazziclay.fclaybackend.notes.service.NotesService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +15,18 @@ import java.util.function.Supplier;
 public class NotesController {
     private NotesService notesService;
 
-
-
     @GetMapping
-    public ResponseEntity<?> getNoteText(@RequestHeader("Authorization") String authorization) {
-        return handle(() -> notesService.getNoteText(authorization), HttpStatus.OK);
+    public ResponseEntity<?> getNoteText(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        return handle(() -> notesService.getNote(authorization));
     }
 
     @PatchMapping
-    public ResponseEntity<?> setNoteText(@RequestHeader("Authorization") String authorization, @RequestBody String note) {
-        return handle(() -> notesService.setNoteText(authorization, note), HttpStatus.OK);
+    public ResponseEntity<?> setNoteText(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody NoteDto note) {
+        return handle(() -> notesService.setNote(authorization, note));
     }
 
-
-    private <T> ResponseEntity<?> handle(Supplier<T> supplier, HttpStatus success) {
-        return FclaySpringApplication.handle(supplier, success);
+    private <T> ResponseEntity<?> handle(Supplier<T> supplier) {
+        return FclaySpringApplication.handle(supplier, HttpStatus.OK);
     }
 }
 

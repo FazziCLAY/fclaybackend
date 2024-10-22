@@ -1,7 +1,7 @@
 package com.fazziclay.fclaybackend.person.status;
 
 import com.fazziclay.fclaybackend.FclaySpringApplication;
-import com.fazziclay.fclaybackend.Logger;
+import com.fazziclay.fclaybackend.person.status.service.PersonsStatusService;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,52 +11,63 @@ import org.springframework.web.bind.annotation.*;
 import java.util.function.Supplier;
 
 @RestController
-@RequestMapping("/person/status")
+@RequestMapping(path = {"/person/{person_name}/status", "/person/status"})
 @AllArgsConstructor
 public class PersonStatusController {
+    private final PersonsStatusService service;
 
-    private final PersonStatusService service;
-
+    // get root
     @GetMapping
-    public ResponseEntity<?> read() {
-        return handle(service::getActualPersonStatus, HttpStatus.OK);
+    public ResponseEntity<?> read(@PathVariable(value = "person_name", required = false) String personName,
+                                  @RequestHeader(value = "Authorization", required = false) String authorization) {
+        return handle(() -> service.getActualPersonStatus(personName, authorization), HttpStatus.OK);
     }
 
 
+    // get cute player
     @GetMapping("/cuteTextPlayer")
-    public ResponseEntity<?> cuteTextPlayer() {
+    public ResponseEntity<?> cuteTextPlayer(@PathVariable(value = "person_name", required = false) String personName,
+                                            @RequestHeader(value = "Authorization", required = false) String authorization) {
         return handle(() -> {
             try {
-                return CuteTextPlayerGenerator.v1(service.getStatus(), "$").replace("\n", "<br>");
+                return CuteTextPlayerGenerator.v1(service.getActualPersonStatus(personName, authorization), "$").replace("\n", "<br>");
             } catch (Exception ignored) {
                 return "";
             }
         }, HttpStatus.OK);
     }
 
+    // get chartjs
     @GetMapping("/chartjs")
-    public ResponseEntity<?> chartjs() {
-        return handle(() -> service.getStatistic().asJsonObject(), HttpStatus.OK);
+    public ResponseEntity<?> chartjs(@PathVariable(value = "person_name", required = false) String personName,
+                                     @RequestHeader(value = "Authorization", required = false) String authorization) {
+        return handle(() -> service.getStatistic(personName, authorization).asJsonObject(), HttpStatus.OK);
     }
 
+    // PUT headphones
     @PutMapping("/headphones")
-    public ResponseEntity<?> put(@RequestHeader("Authorization") String authorization, @RequestBody PlaybackDto status) {
-        Logger.debug("put: " + status);
-        return handle(() -> service.putHeadphones(authorization, status), HttpStatus.OK);
+    public ResponseEntity<?> put(@PathVariable(value = "person_name", required = false) String personName,
+                                 @RequestHeader(value = "Authorization", required = false) String authorization,
+                                 @RequestBody PlaybackDto status) {
+        return handle(() -> service.putHeadphones(personName, authorization, status), HttpStatus.OK);
     }
 
+    // PATCH headphones
     @PatchMapping("/headphones")
-    public ResponseEntity<?> patch(@RequestHeader("Authorization") String authorization, @RequestBody PlaybackDto status) {
-        Logger.debug("patch: " + status);
-        return handle(() -> service.patchHeadphones(authorization, status), HttpStatus.OK);
+    public ResponseEntity<?> patch(@PathVariable(value = "person_name", required = false) String personName,
+                                   @RequestHeader(value = "Authorization", required = false) String authorization,
+                                   @RequestBody PlaybackDto status) {
+        return handle(() -> service.patchHeadphones(personName, authorization, status), HttpStatus.OK);
     }
 
+    // DELETE headphones
     @DeleteMapping("/headphones")
-    public ResponseEntity<?> delete(@RequestHeader("Authorization") String authorization) {
-        Logger.debug("delete");
-        return handle(() -> service.putHeadphones(authorization, null), HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> delete(@PathVariable(value = "person_name", required = false) String personName,
+                                    @RequestHeader(value = "Authorization", required = false) String authorization) {
+        return handle(() -> service.putHeadphones(personName, authorization, null), HttpStatus.NO_CONTENT);
     }
 
+    // handle errors
     private <T> ResponseEntity<?> handle(Supplier<T> supplier, HttpStatus success) {
         return FclaySpringApplication.handle(supplier, success);
     }

@@ -1,11 +1,12 @@
 package com.fazziclay.fclaybackend.person.status.autopost.telegram;
 
 import com.fazziclay.fclaybackend.Logger;
-import com.fazziclay.fclaybackend.config.TelegramBotConfig;
 import com.fazziclay.fclaybackend.person.status.CuteTextPlayerGenerator;
 import com.fazziclay.fclaybackend.person.status.PersonStatus;
 import com.fazziclay.fclaybackend.person.status.autopost.AutoPostFilter;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -13,7 +14,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import javax.json.JsonObject;
+import java.util.HashMap;
 import java.util.Map;
 
 public class TelegramBotAutoPost extends AutoPostFilter {
@@ -21,12 +22,17 @@ public class TelegramBotAutoPost extends AutoPostFilter {
     private final String token;
     private final String chatId;
     private final Map<String, String> emojis;
-    private TelegramBotConfig cfg;
+    private final String silenceMsg;
 
-    public TelegramBotAutoPost(String token, String chatId, Map<String, String> emojis) {
+    public TelegramBotAutoPost(String token, String chatId, JsonObject emojis, JsonElement silenceMsg) {
         this.token = token;
         this.chatId = chatId;
-        this.emojis = emojis;
+        this.emojis = new HashMap<>();
+        for (String s : emojis.keySet()) {
+            var emoji = emojis.get(s).getAsString();
+            this.emojis.put(s, emoji);
+        }
+        this.silenceMsg = silenceMsg == null ? null : silenceMsg.getAsString();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.telegram.org/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -35,16 +41,11 @@ public class TelegramBotAutoPost extends AutoPostFilter {
         this.api = retrofit.create(TelegramBotApi.class);
     }
 
-    public TelegramBotAutoPost(TelegramBotConfig config) {
-        this(config.getToken(), config.getChatId(), config.getEmojis());
-        cfg = config;
-    }
-
     public void sendMessageAbout(PersonStatus status) {
         PlaybackDto playback = status.getHeadphones();
         if (playback == null) {
-            if (cfg.silenceMsg != null) {
-                sendMessage(cfg.silenceMsg);
+            if (silenceMsg != null) {
+                sendMessage(silenceMsg);
             }
 
         } else {
