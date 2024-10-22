@@ -1,6 +1,6 @@
 package com.fazziclay.fclaybackend.person.status;
 
-import com.fazziclay.fclaybackend.FclaySpringApplication;
+import com.fazziclay.fclaybackend.Util;
 import com.fazziclay.fclaybackend.person.status.service.PersonsStatusService;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.AllArgsConstructor;
@@ -69,6 +69,6 @@ public class PersonStatusController {
 
     // handle errors
     private <T> ResponseEntity<?> handle(Supplier<T> supplier, HttpStatus success) {
-        return FclaySpringApplication.handle(supplier, success);
+        return Util.handleError(supplier, success);
     }
 }

@@ -21,7 +21,7 @@ public class StatisticAutoPost extends AutoPostFilter {
         PlaybackDto headphones = status.getHeadphones();
 
         if (headphones != null) {
-            statistic.appendStat(FclaySpringApplication.clone(headphones));
+            statistic.appendStat(PlaybackDto.cloneDto(headphones));
         }
     }
 }

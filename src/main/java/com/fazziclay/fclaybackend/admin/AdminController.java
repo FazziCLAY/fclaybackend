@@ -1,6 +1,6 @@
 package com.fazziclay.fclaybackend.admin;
 
-import com.fazziclay.fclaybackend.FclaySpringApplication;
+import com.fazziclay.fclaybackend.Util;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,6 @@ public class AdminController {
 
     @GetMapping("/reload")
     public ResponseEntity<?> reload(@RequestParam("accessToken") String accessToken) {
-        return FclaySpringApplication.handle(() -> adminService.reload(accessToken), HttpStatus.OK);
+        return Util.handleError(() -> adminService.reload(accessToken), HttpStatus.OK);
     }
 }

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.fazziclay"
-version = "0.0.2-SNAPSHOT"
+version = "0.0.3-SNAPSHOT"
 
 java {
 	toolchain {
@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-	implementation(files("./libs/api-1.0.jar"))
+	implementation(files("./libs/api-1.1.jar"))
 
 	implementation("com.squareup.retrofit2:retrofit:2.10.0")
 	implementation("com.squareup.retrofit2:converter-gson:2.10.0")

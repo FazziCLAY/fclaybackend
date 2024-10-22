@@ -1,6 +1,6 @@
 package com.fazziclay.fclaybackend.notes;
 
-import com.fazziclay.fclaybackend.FclaySpringApplication;
+import com.fazziclay.fclaybackend.Util;
 import com.fazziclay.fclaybackend.notes.service.NotesService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class NotesController {
     }
 
     private <T> ResponseEntity<?> handle(Supplier<T> supplier) {
-        return FclaySpringApplication.handle(supplier, HttpStatus.OK);
+        return Util.handleError(supplier, HttpStatus.OK);
     }
 }
 
