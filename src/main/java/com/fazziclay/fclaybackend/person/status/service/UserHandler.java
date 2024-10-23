@@ -100,7 +100,7 @@ public class UserHandler implements Destroy {
 
     public PersonStatus getActualPersonStatus(@Nullable String authorization) {
         checkGetPermission(authorization);
-        status.actualizePersonStatus();
+        status.actualize();
         return status;
     }
 

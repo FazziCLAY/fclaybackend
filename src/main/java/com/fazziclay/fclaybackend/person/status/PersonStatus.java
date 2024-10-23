@@ -1,6 +1,5 @@
 package com.fazziclay.fclaybackend.person.status;
 
-import com.fazziclay.fclaybackend.Logger;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +30,7 @@ public class PersonStatus {
     public void setOriginalHeadphones(PlaybackDto originalHeadphones, long latestUpdated) {
         this.originalHeadphones = originalHeadphones;
         this.originalHeadphonesTime = latestUpdated;
+        actualizeHeadphones();
     }
 
     public void clear() {
@@ -44,7 +44,7 @@ public class PersonStatus {
     /**
      * Call before return it object to API endpoint
      */
-    public void actualizePersonStatus() {
+    public void actualizeHeadphones() {
         PlaybackDto actual = originalHeadphones;
         if (originalHeadphones != null) {
             Long position = originalHeadphones.getPosition();
@@ -57,5 +57,9 @@ public class PersonStatus {
         }
 
         setHeadphones(actual);
+    }
+
+    public void actualize() {
+        actualizeHeadphones();
     }
 }
