@@ -1,6 +1,7 @@
 package com.fazziclay.fclaybackend.notes.service;
 
 import com.fazziclay.fclaybackend.Destroy;
+import com.fazziclay.fclaybackend.Logger;
 import com.fazziclay.fclaybackend.notes.NoteCodec;
 import com.fazziclay.fclaybackend.notes.NoteDto;
 import com.fazziclay.fclaybackend.states.NotesConfig;
@@ -41,6 +42,7 @@ public class NoteUser implements Destroy {
             backup();
             save();
         }
+        note.validate();
     }
 
     private void backup() {
@@ -62,7 +64,6 @@ public class NoteUser implements Destroy {
         NoteCodec.CODEC.encode(note, Files.newOutputStream(file.toPath()));
     }
 
-
     public boolean isAccessGrant(@Nullable String authorization) {
         return Objects.equals(this.accessToken, authorization);
     }
@@ -72,6 +73,11 @@ public class NoteUser implements Destroy {
     }
 
     public NoteDto setNote(NoteDto note) {
+        Objects.requireNonNull(note);
+        Objects.requireNonNull(note.getText());
+        if (note.getLatestEdit() != null) {
+            Logger.debug("NoteUser::setNote received NoteDto with latestEdit. Ignored value.");
+        }
         if (!Objects.equals(this.note.getText(), note.getText())) {
             backup();
             this.note.setText(note.getText());

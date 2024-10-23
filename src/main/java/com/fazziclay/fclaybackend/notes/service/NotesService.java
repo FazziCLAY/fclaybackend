@@ -52,6 +52,7 @@ public class NotesService {
 
     @SneakyThrows
     public NoteDto setNote(String authorization, NoteDto note) {
+        note.validate();
         return getUserOrThrow(authorization).setNote(note);
     }
 }
