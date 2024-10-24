@@ -53,5 +53,5 @@ jobs:
         continue-on-error: true
 
       - name: start new container
-        run: docker run --name=fclaybackend-container -e SPRING_CONFIG_LOCATION=/var/lib/fclaybackend/cfg.properties -v /home/fazziclay/spring:/var/lib/fclaybackend -d fclaybackend:latest
+        run: docker run --name=fclaybackend-container -v fclaybackend-data:/var/lib/fclaybackend -d fclaybackend:latest
 
