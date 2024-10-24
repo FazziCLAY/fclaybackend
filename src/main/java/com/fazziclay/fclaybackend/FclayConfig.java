@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
 @Configuration
-@PropertySource("application.properties")
 @ConfigurationProperties(prefix = "fclaybackend")
 @Getter
 @Setter
