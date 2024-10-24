@@ -1,4 +1,4 @@
-name: Deploy buy runner
+name: Deploy to prod
 on:
   push:
     branches: [ "main" ]
@@ -16,7 +16,7 @@ jobs:
 
   debug:
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
-    needs: test # Запускаем только если джоба prepare-environment прошла успешно
+    needs: test
     steps:
       - run: echo MINI DEBUG START
       - run: pwd
@@ -26,9 +26,9 @@ jobs:
       - run: echo MINI DEBUG END
 
 
-  build_and_deploy:
+  build_docker:
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
-    needs: test # Запускаем только если джоба prepare-environment прошла успешно
+    needs: test
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
@@ -37,7 +37,18 @@ jobs:
         run: ./gradlew bootJar
 
       - name: Docker build
-        run: docker build -t fclaybackend:main .
+        run: docker build -t fclaybackend:latest .
 
-      - name: start
-        run: docker run -d -p 8080:8080 fclaybackend:main
+
+  deploy_container:
+    runs-on: self-hosted
+    needs: build_docker
+    steps:
+      - name: stop current container
+        run: docker stop fclaybackend-container
+
+      - name: remove current container
+        run: docker rm fclaybackend-container
+
+      - name: start new container
+        run: docker run --name=fclaybackend-container -e SPRING_CONFIG_LOCATION=/var/lib/fclaybackend/cfg.properties -v /home/fazziclay/spring:/var/lib/fclaybackend -d fclaybackend:latest
