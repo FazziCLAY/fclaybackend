@@ -46,9 +46,12 @@ jobs:
     steps:
       - name: stop current container
         run: docker stop fclaybackend-container
+        continue-on-error: true
 
       - name: remove current container
         run: docker rm fclaybackend-container
+        continue-on-error: true
 
       - name: start new container
         run: docker run --name=fclaybackend-container -e SPRING_CONFIG_LOCATION=/var/lib/fclaybackend/cfg.properties -v /home/fazziclay/spring:/var/lib/fclaybackend -d fclaybackend:latest
+
