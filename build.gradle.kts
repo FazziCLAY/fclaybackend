@@ -32,8 +32,8 @@ dependencies {
 	implementation("com.squareup.retrofit2:converter-gson:2.10.0")
 
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("com.mysql:mysql-connector-j")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+	//implementation("com.mysql:mysql-connector-j")
 	implementation("com.google.code.gson:gson:2.11.0")
 	implementation("jakarta.platform:jakarta.jakartaee-api:8.0.0")
 	compileOnly("org.projectlombok:lombok")
