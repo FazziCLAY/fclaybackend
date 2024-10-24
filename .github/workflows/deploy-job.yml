@@ -14,21 +14,30 @@ jobs:
       - name: Run tests
         run: ./gradlew test
 
-  prepare-environment:
+  debug:
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
-    needs: test # Запускаем только если джоба test прошла успешно
+    needs: tests # Запускаем только если джоба prepare-environment прошла успешно
     steps:
-      - name: Stop and remove containers, networks
-        run: docker-compose down
-      - name: Remove unused data
-        run: docker system prune -a -f
+      - run: echo MINI DEBUG START
+      - run: pwd
+      - run: ls
+      - run: echo $USER
+      - run: ll
+      - run: echo MINI DEBUG END
 
 
-  deploy:
+  build_and_deploy:
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
-    needs: prepare-environment # Запускаем только если джоба prepare-environment прошла успешно
+    needs: tests # Запускаем только если джоба prepare-environment прошла успешно
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
-      - name: docker-compose
-        run: docker-compose up -d
+
+      - name: Build
+        run: ./gradlew bootJar
+
+      - name: Docker build
+        run: docker build -t fclaybackend:main .
+
+      - name: start
+        run: docker run -d -p 8080:8080 fclaybackend:main
