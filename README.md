@@ -1,4 +1,6 @@
 # fclaybackend
+[![Deploy to prod](https://github.com/FazziCLAY/fclaybackend/actions/workflows/deploy-job.yml/badge.svg?branch=main)](https://github.com/FazziCLAY/fclaybackend/actions/workflows/deploy-job.yml)
+
 Backend on Spring for my life
 
 
