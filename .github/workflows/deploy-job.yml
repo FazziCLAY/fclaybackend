@@ -22,7 +22,7 @@ jobs:
       - run: pwd
       - run: ls
       - run: echo $USER
-      - run: ll
+      - run: ls -l
       - run: echo MINI DEBUG END
 
 
