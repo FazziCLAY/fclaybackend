@@ -53,5 +53,5 @@ jobs:
         continue-on-error: true
 
       - name: start new container
-        run: docker run --name=fclaybackend-container -v fclaybackend-data:/var/lib/fclaybackend -d fclaybackend:latest
+        run: docker run --name=fclaybackend-container -v fclaybackend-data:/var/lib/fclaybackend -p 8080:8080 -d fclaybackend:latest
 
