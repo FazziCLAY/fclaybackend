@@ -9,8 +9,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Разрешить CORS для всех путей
-                .allowedOrigins("*") // Замените на ваш домен для большей безопасности
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Укажите необходимые методы
-                .allowedHeaders("Authorization", "Content-Type"); // Укажите разрешенные заголовки
+                .allowedOriginPatterns("*") // Замените на ваш домен для большей безопасности
+                .allowedMethods("*") // Укажите необходимые методы
+                .allowedHeaders("*"); // Укажите разрешенные заголовки
     }
 }
