@@ -46,13 +46,16 @@ public class NotesService {
                 .orElseThrow(() -> new HttpException("No user found", HttpStatus.UNAUTHORIZED));
     }
 
-    public NoteDto getNote(String authorization) {
-        return getUserOrThrow(authorization).getNote();
+    public NoteDto getNote(String authorization, @Nullable String[] specKeys) {
+        return getUserOrThrow(authorization).getNote(specKeys);
     }
 
     @SneakyThrows
     public NoteDto setNote(String authorization, NoteDto note) {
-        note.validate();
         return getUserOrThrow(authorization).setNote(note);
+    }
+
+    public void lockNote(String authorization) {
+        getUserOrThrow(authorization).lock();
     }
 }

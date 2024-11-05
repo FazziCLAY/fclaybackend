@@ -6,6 +6,7 @@ import com.fazziclay.fclaybackend.notes.NoteCodec;
 import com.fazziclay.fclaybackend.notes.NoteDto;
 import com.fazziclay.fclaybackend.states.NotesConfig;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -14,12 +15,17 @@ import java.nio.file.Files;
 import java.util.Objects;
 
 public class NoteUser implements Destroy {
+    private static final long MAX_LOCKED_MS = 6 * 1000;
+
     private final File noteDir;
     private final File upstreamFile;
     private final String accessToken;
     private final String name;
 
     private final NoteDto note;
+    // <= 0 - no locked
+    // other valued - millis on lock start
+    private long lockedAt;
 
     public NoteUser(File notesDir, NotesConfig.NoteUser cfg) throws IOException {
         accessToken = cfg.getAccessToken();
@@ -38,7 +44,7 @@ public class NoteUser implements Destroy {
             backup();
 
         } else {
-            note = new NoteDto("Default note text", System.currentTimeMillis());
+            note = new NoteDto("Default note text", System.currentTimeMillis(), null);
             backup();
             save();
         }
@@ -69,19 +75,32 @@ public class NoteUser implements Destroy {
     }
 
     public NoteDto getNote() {
-        return new NoteDto(this.note.getText(), this.note.getLatestEdit());
+        return getNote(null);
+    }
+
+    public NoteDto getNote(@Nullable String[] specKeys) {
+        val noteDto = new NoteDto(this.note.getText(), this.note.getLatestEdit(), (System.currentTimeMillis() - lockedAt < MAX_LOCKED_MS) ? 1 : null);
+        if (specKeys != null) {
+            noteDto.clearExclude(specKeys);
+        }
+        return noteDto;
     }
 
     public NoteDto setNote(NoteDto note) {
+        note.validate();
         Objects.requireNonNull(note);
         Objects.requireNonNull(note.getText());
         if (note.getLatestEdit() != null) {
             Logger.debug("NoteUser::setNote received NoteDto with latestEdit. Ignored value.");
         }
+        if (note.getL() != null) {
+            Logger.debug("NoteUser::setNote received NoteDto with l. Ignored value.");
+        }
         if (!Objects.equals(this.note.getText(), note.getText())) {
             backup();
             this.note.setText(note.getText());
             this.note.setLatestEdit(System.currentTimeMillis());
+            this.lockedAt = 0; // unlock after changes received
             save();
         }
         return getNote();
@@ -90,5 +109,9 @@ public class NoteUser implements Destroy {
     @Override
     public void destroy() {
         // do nothing
+    }
+
+    public void lock() {
+        lockedAt = System.currentTimeMillis();
     }
 }
