@@ -10,7 +10,6 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +25,7 @@ public class FclayConfig {
     private String personStatusConfiguration;
     private String notesConfiguration;
     private String adminTokenFile;
+    private String authDbDir;
 
     private transient NotesConfig notes;
     private transient PersonsStatusConfig personsStatus;

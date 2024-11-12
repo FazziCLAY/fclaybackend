@@ -31,6 +31,11 @@ dependencies {
 	implementation("com.squareup.retrofit2:retrofit:2.10.0")
 	implementation("com.squareup.retrofit2:converter-gson:2.10.0")
 
+	implementation("org.apache.commons:commons-lang3:3.16.0")
+	implementation("commons-io:commons-io:2.16.1")
+	implementation("commons-codec:commons-codec:1.17.1") // DigestUtils for sha256
+
+	//implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	//implementation("com.mysql:mysql-connector-j")
