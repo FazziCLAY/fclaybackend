@@ -15,8 +15,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestHeader(value = "Authorization", required = false) String authToken, @RequestBody(required = false) LoginRequestDto requestDto) {
-        return Util.handleError(() -> authService.login(authToken, requestDto), HttpStatus.OK);
+    public ResponseEntity<?> login(@RequestHeader(value = "X-Real-IP", required = false) String requestIp, @RequestHeader(value = "Authorization", required = false) String authToken, @RequestBody(required = false) LoginRequestDto requestDto) {
+        return Util.handleError(() -> authService.login(authToken, requestDto, requestIp), HttpStatus.OK);
     }
 
     @PostMapping("/changePassword")

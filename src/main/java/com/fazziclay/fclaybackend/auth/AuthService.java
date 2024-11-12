@@ -7,10 +7,14 @@ import com.fazziclay.fclaybackend.auth.db.Session;
 import com.fazziclay.fclaybackend.auth.db.TabItem;
 import com.fazziclay.fclaybackend.auth.db.User;
 import com.fazziclay.fclaybackend.auth.dto.*;
+import com.fazziclay.fclaybackend.auth.exception.IpRateLimitException;
 import com.fazziclay.fclaybackend.auth.misc.Permissions;
 import com.fazziclay.fclaybackend.auth.misc.Validate;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.*;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,12 +23,16 @@ import javax.json.JsonArray;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Setter
 @Getter
 public class AuthService {
     private AuthDB db;
+    private LoadingCache<String, IPHistory> ipHistoryCache = Caffeine.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .build(IPHistory::build);
 
     public AuthService(@Autowired FclayConfig config) {
         db = new AuthDB(new File(config.getAuthDbDir()));
@@ -32,7 +40,7 @@ public class AuthService {
     }
 
     @SneakyThrows
-    public LoginResponseDto login(String authToken, LoginRequestDto requestDto) {
+    public LoginResponseDto login(@Nullable String authToken, @Nullable LoginRequestDto requestDto, @Nullable String requestIp) {
         // is provided token in header
         if (authToken != null) {
             val session = db.getSession(authToken);
@@ -47,6 +55,12 @@ public class AuthService {
 
         // is provided request body (expected with login and password)
         if (requestDto != null) {
+            Objects.requireNonNull(requestIp);
+            IPHistory ipHistory = ipHistoryCache.get(requestIp);
+            ipHistory.addAttempt();
+            if (ipHistory.isBlocked()) {
+                throw new IpRateLimitException(requestIp);
+            }
             Session session = db.tryToCreateSession(requestDto);
             return LoginResponseDto.builder()
                     .accessToken(session.getAccessToken())

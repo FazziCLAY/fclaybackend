@@ -34,6 +34,7 @@ dependencies {
 	implementation("org.apache.commons:commons-lang3:3.16.0")
 	implementation("commons-io:commons-io:2.16.1")
 	implementation("commons-codec:commons-codec:1.17.1") // DigestUtils for sha256
+	implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
 	//implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
