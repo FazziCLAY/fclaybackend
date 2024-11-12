@@ -97,7 +97,7 @@ public class AuthDB {
         if (getUserByName(username) != null) {
             throw new RuntimeException("User with this username already exist!");
         }
-        if (!Validate.isValidUsername(username) || Validate.isValidPassword(password)) {
+        if (!Validate.isValidUsername(username) || !Validate.isValidPassword(password)) {
             throw new HttpException("username or password incorrect", HttpStatus.BAD_REQUEST);
         }
 
