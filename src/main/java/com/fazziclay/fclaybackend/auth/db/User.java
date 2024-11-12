@@ -19,7 +19,9 @@ public class User {
     private String passwordSha256;
     private long createdAt;
     private boolean banned;
+    @Builder.Default
     private Permissions[] permissions = new Permissions[0];
+    @Builder.Default
     private List<TabItem> tabs = new ArrayList<>();
 
     public UserDto toDto() {
