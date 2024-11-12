@@ -4,6 +4,8 @@ import com.fazziclay.fclaybackend.auth.dto.UserDto;
 import com.fazziclay.fclaybackend.auth.misc.Permissions;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,6 +20,7 @@ public class User {
     private long createdAt;
     private boolean banned;
     private Permissions[] permissions = new Permissions[0];
+    private List<TabItem> tabs = new ArrayList<>();
 
     public UserDto toDto() {
         return new UserDto(id, username, permissions, createdAt);

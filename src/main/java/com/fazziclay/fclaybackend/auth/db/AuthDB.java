@@ -3,6 +3,7 @@ package com.fazziclay.fclaybackend.auth.db;
 import com.fazziclay.fclaybackend.HttpException;
 import com.fazziclay.fclaybackend.Logger;
 import com.fazziclay.fclaybackend.ThrowableConsumer;
+import com.fazziclay.fclaybackend.auth.dto.ChangePasswordRequestDto;
 import com.fazziclay.fclaybackend.auth.dto.LoginRequestDto;
 import com.fazziclay.fclaybackend.auth.misc.Generator;
 import com.fazziclay.fclaybackend.auth.misc.Permissions;
@@ -20,24 +21,26 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 // почему я избегаю баз данных?
 public class AuthDB {
+    private final File dir;
     private File file;
     private File fileBak;
     private DbStorage dbStorage;
     private Gson gson = new Gson();
     private SaveThread save = new SaveThread();
 
+    public AuthDB(File dir) {
+        this.dir = dir;
+    }
+
     @SneakyThrows
     public void init() {
-        file = new File("./authdb/db.json");
-        fileBak = new File("./authdb/db.json.bak");
+        file = new File(dir, "authdb.json");
+        fileBak = new File(dir,"authdb.json.bak");
 
         if (file.exists()) {
             bakAct(file -> {
@@ -51,6 +54,7 @@ public class AuthDB {
             save();
         }
         save.start();
+        Logger.debug("AuthDB initialized!");
     }
 
     private void bakAct(ThrowableConsumer<Exception, File> act, Runnable noOne) {
@@ -93,7 +97,7 @@ public class AuthDB {
         if (getUserByName(username) != null) {
             throw new RuntimeException("User with this username already exist!");
         }
-        if (!Validate.validateUsername(username) || Validate.validatePassword(password)) {
+        if (!Validate.isValidUsername(username) || Validate.isValidPassword(password)) {
             throw new HttpException("username or password incorrect", HttpStatus.BAD_REQUEST);
         }
 
@@ -112,17 +116,45 @@ public class AuthDB {
     }
 
     // direct patch password;
-    private void changePassword(User user, String newPass) {
-        Validate.validatePassword(newPass);
-        user.setPasswordSha256(Validate.sha256sum(newPass));
+    private void changePasswordDirect(User user, String newPass) {
+        dataManipulate(() -> {
+            Validate.validatePassword(newPass);
+            user.setPasswordSha256(Validate.sha256sum(newPass));
+        });
     }
 
+    public void changePassword(User user, ChangePasswordRequestDto dto) {
+        dataManipulate(() -> {
+            if (!Validate.isUserPasswordEquals(user, dto.getOld_password())) {
+                throw new HttpException("Old password incorrect", HttpStatus.FORBIDDEN);
+            }
+            changePasswordDirect(user, dto.getNew_password());
+        });
+    }
+
+    public List<TabItem> getUserNoteTabs(User user) {
+        return user.getTabs();
+    }
+
+    public List<TabItem> setUserNoteTabs(User user, List<TabItem> tabItems) {
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(tabItems);
+        for (TabItem tabItem : tabItems) {
+            Objects.requireNonNull(tabItem);
+            Objects.requireNonNull(tabItem.getName());
+            Objects.requireNonNull(tabItem.getAccessToken());
+        }
+        dataManipulate(() -> {
+            user.setTabs(tabItems);
+        });
+        return getUserNoteTabs(user);
+    }
 
     // ========= SESSIONS =========
     @Nullable
     public Session getSession(String authToken) {
         val session = dbStorage.sessions.get(authToken);
-        session.setAccessTime(System.currentTimeMillis());
+        if (session != null) session.setAccessTime(System.currentTimeMillis());
         return session;
     }
 
@@ -152,7 +184,7 @@ public class AuthDB {
             throw unauthorized;
         }
 
-        if (!Validate.checkUserPassword(user, password)) {
+        if (!Validate.isUserPasswordEquals(user, password)) {
             throw unauthorized;
         }
 

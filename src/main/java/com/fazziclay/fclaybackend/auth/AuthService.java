@@ -1,31 +1,33 @@
 package com.fazziclay.fclaybackend.auth;
 
+import com.fazziclay.fclaybackend.FclayConfig;
 import com.fazziclay.fclaybackend.HttpException;
 import com.fazziclay.fclaybackend.auth.db.AuthDB;
 import com.fazziclay.fclaybackend.auth.db.Session;
+import com.fazziclay.fclaybackend.auth.db.TabItem;
 import com.fazziclay.fclaybackend.auth.db.User;
-import com.fazziclay.fclaybackend.auth.dto.AddUserRequestDto;
-import com.fazziclay.fclaybackend.auth.dto.LoginRequestDto;
-import com.fazziclay.fclaybackend.auth.dto.LoginResponseDto;
-import com.fazziclay.fclaybackend.auth.dto.UserDto;
+import com.fazziclay.fclaybackend.auth.dto.*;
 import com.fazziclay.fclaybackend.auth.misc.Permissions;
 import com.fazziclay.fclaybackend.auth.misc.Validate;
-import jakarta.annotation.PostConstruct;
 import lombok.*;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.json.JsonArray;
+import java.io.File;
+import java.util.List;
+import java.util.Objects;
+
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
 public class AuthService {
     private AuthDB db;
 
-    @PostConstruct
-    private void init() {
-        db = new AuthDB();
+    public AuthService(@Autowired FclayConfig config) {
+        db = new AuthDB(new File(config.getAuthDbDir()));
         db.init();
     }
 
@@ -54,6 +56,16 @@ public class AuthService {
         throw new HttpException("Invalid request", HttpStatus.BAD_REQUEST);
     }
 
+    public List<TabItem> getNoteTabs(String authToken) {
+        var auth = authOrThrow(authToken, Permissions.NOTES_TABS_READ);
+        return db.getUserNoteTabs(auth.getRight());
+    }
+
+    public List<TabItem> setNoteTabs(String authToken, List<TabItem> post) {
+        var auth = authOrThrow(authToken, Permissions.NOTES_TABS_WRITE);
+        return db.setUserNoteTabs(auth.getRight(), post);
+    }
+
     // add user
     public UserDto addUser(String authToken, AddUserRequestDto requestDto) {
         authOrThrow(authToken, Permissions.ADMIN_MANAGE_USERS);
@@ -69,7 +81,7 @@ public class AuthService {
     }
 
     // auth
-    private void authOrThrow(String authToken, Permissions... required) {
+    public Pair<Session, User> authOrThrow(String authToken, Permissions... required) {
         val session = db.getSession(authToken);
         if (Validate.isSessionActive(session)) {
             session.setAccessTime(System.currentTimeMillis());
@@ -80,8 +92,26 @@ public class AuthService {
             if (!Validate.isUserPerm(user, required)) {
                 throw new HttpException("No perms for this", HttpStatus.FORBIDDEN);
             }
+            return Pair.of(session, user);
         } else {
             throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public void changePassword(String authToken, ChangePasswordRequestDto requestDto) {
+        var auth = authOrThrow(authToken, Permissions.CHANGE_PASSWORD);
+        Objects.requireNonNull(requestDto);
+        Objects.requireNonNull(requestDto.getNew_password());
+        Objects.requireNonNull(requestDto.getOld_password());
+        db.changePassword(auth.getRight(), requestDto);
+    }
+
+    public UserDto getMe(String authToken) {
+        val sessionUserPair = authOrThrow(authToken);
+        return sessionUserPair.getRight().toDto();
+    }
+
+    public List<TabItem> setNoteTabs(String authorization, JsonArray tabsToPost) {
+        return null;
     }
 }

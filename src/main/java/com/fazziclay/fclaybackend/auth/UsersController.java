@@ -22,4 +22,9 @@ public class UsersController {
     public ResponseEntity<?> getAllUsers(@RequestHeader(value = "Authorization") String authToken) {
         return Util.handleError(() -> authService.getAllUsers(authToken), HttpStatus.OK);
     }
+
+    @GetMapping("me")
+    public ResponseEntity<?> getMe(@RequestHeader(value = "Authorization") String authToken) {
+        return Util.handleError(() -> authService.getMe(authToken), HttpStatus.OK);
+    }
 }

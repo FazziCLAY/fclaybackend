@@ -11,13 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validate {
-    private static final String passwordRegexp = "^(?=.*[0-9])"
-            + "(?=.*[a-z])(?=.*[A-Z])"
-            + "(?=.*[@#$%^&+=])"
-            + "(?=\\S+$).{8,100}$";
-
-    private static final Pattern passwordRegexpPattern = Pattern.compile(passwordRegexp);
-
     public static boolean isSessionActive(Session session) {
         return session != null && !session.isExpired();
     }
@@ -30,6 +23,9 @@ public class Validate {
             if (!contains(user.getPermissions(), permission)) {
                 return false;
             }
+            if (permission.isDef()) {
+                return true;
+            }
         }
         return true;
     }
@@ -41,23 +37,33 @@ public class Validate {
         return false;
     }
 
-    public static boolean validatePassword(String pass) {
+    public static boolean isValidPassword(String pass) {
         if (pass == null || pass.trim().isEmpty() || pass.length() > 100) {
             return false;
         }
 
-        Matcher m = passwordRegexpPattern.matcher(pass);
-        return m.matches();
+        return true;
     }
 
-    public static boolean validateUsername(String username) {
+    public static void validatePassword(String password) {
+        if (!isValidPassword(password))
+            throw new RuntimeException("Password incorrect format");
+    }
+
+    public static boolean isValidUsername(String username) {
         if (username == null || username.trim().isEmpty() || username.length() > 50) {
             return false;
         }
         return !username.contains(" ");
     }
 
-    public static boolean checkUserPassword(User user, String password) {
+    public static void validateUsername(String username) {
+        if (!isValidUsername(username))
+            throw new RuntimeException("Username incorrect format");
+    }
+
+
+    public static boolean isUserPasswordEquals(User user, String password) {
         Objects.requireNonNull(user);
         Objects.requireNonNull(password);
         val userPass = user.getPasswordSha256();
