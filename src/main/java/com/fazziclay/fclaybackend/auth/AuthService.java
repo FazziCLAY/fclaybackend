@@ -57,10 +57,11 @@ public class AuthService {
         if (requestDto != null) {
             Objects.requireNonNull(requestIp);
             IPHistory ipHistory = ipHistoryCache.get(requestIp);
-            ipHistory.addAttempt();
-            if (ipHistory.isBlocked()) {
-                throw new IpRateLimitException(requestIp);
+            long requestTime = System.currentTimeMillis();
+            if (ipHistory.isBlocked(requestTime)) {
+                throw new IpRateLimitException(requestIp, ipHistory);
             }
+            ipHistory.addAttempt(requestTime);
             Session session = db.tryToCreateSession(requestDto);
             return LoginResponseDto.builder()
                     .accessToken(session.getAccessToken())
