@@ -290,6 +290,7 @@ public class AuthDB {
                 Files.copy(file.toPath(), fileBak.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
             Files.createDirectories(file.getParentFile().toPath());
+            Files.deleteIfExists(file.toPath());
             Files.writeString(file.toPath(), gson.toJson(dbStorage), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             if (first) {
                 Files.copy(file.toPath(), fileBak.toPath(), StandardCopyOption.REPLACE_EXISTING);
