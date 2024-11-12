@@ -19,10 +19,7 @@ public class Validate {
         if (contains(user.getPermissions(), Permissions.GOD)) return true;
         for (Permissions permission : permissions) {
             if (!contains(user.getPermissions(), permission)) {
-                return false;
-            }
-            if (permission.isDef()) {
-                return true;
+                return permission.isDef();
             }
         }
         return true;
