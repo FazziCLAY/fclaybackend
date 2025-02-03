@@ -1,6 +1,5 @@
 package com.fazziclay.fclaybackend.person.status.autopost;
 
-import com.fazziclay.fclaybackend.FclaySpringApplication;
 import com.fazziclay.fclaybackend.person.status.PersonStatus;
 import com.fazziclay.fclaybackend.person.status.Statistic;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;

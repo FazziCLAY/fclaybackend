@@ -1,6 +1,5 @@
 package com.fazziclay.fclaybackend;
 
-import com.fazziclay.fclaybackend.states.NotesConfig;
 import com.fazziclay.fclaybackend.states.PersonsStatusConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,26 +26,12 @@ public class FclayConfig {
     private String adminTokenFile;
     private String authDbDir;
 
-    private transient NotesConfig notes;
     private transient PersonsStatusConfig personsStatus;
 
     @PostConstruct
     public void reloadConfigs() {
         Logger.debug("reloadConfigs();");
-        notes = getNotesConfig();
         personsStatus = getPersonsStatusConfig();
-    }
-
-    @SneakyThrows
-    public NotesConfig getNotesConfig() {
-        var file = getNotesConfiguration();
-        var path = new File(file).toPath();
-
-        if (Files.notExists(path)) {
-            Files.writeString(path, GSON.toJson(NotesConfig.defaultConfig()), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
-        }
-
-        return GSON.fromJson(Files.readString(path), NotesConfig.class);
     }
 
     @SneakyThrows
