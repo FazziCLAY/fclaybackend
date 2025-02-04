@@ -30,6 +30,9 @@ public class TelegramBotAutoPost implements IAutoPost {
     public void postPersonStatus(@NotNull PersonStatus status) {
         PlaybackDto playback = status.getHeadphones();
         SongInfo songInfo = SongInfo.create(playback);
+        if (playback == null && headIsNothing) {
+            return;
+        }
         boolean edit = headIsNothing || Objects.equals(songInfo, headPlayback);
         String message = "UwU...";
         if (playback == null) {
