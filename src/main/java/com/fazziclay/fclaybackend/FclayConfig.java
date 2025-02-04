@@ -22,9 +22,6 @@ import java.nio.file.StandardOpenOption;
 public class FclayConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String personStatusConfiguration;
-    private String notesConfiguration;
-    private String adminTokenFile;
-    private String authDbDir;
 
     private transient PersonsStatusConfig personsStatus;
 
