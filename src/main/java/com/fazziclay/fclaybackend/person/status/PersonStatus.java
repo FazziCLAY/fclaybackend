@@ -1,6 +1,7 @@
 package com.fazziclay.fclaybackend.person.status;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,14 +21,14 @@ public class PersonStatus {
             "customStatus"
     );
 
-    private transient SongTime songTime = new SongTime();
+    @JsonIgnore private SongTime songTime = new SongTime();
     @Nullable private PlaybackDto headphones;
     private long onRepeatListeningTime;
     private float onRepeatPlaysCount;
     @Nullable private String moodText;
     @Nullable private String customStatus;
 
-    @Nullable private transient PlaybackDto originalHeadphones;
+    @Nullable @JsonIgnore private PlaybackDto originalHeadphones;
     private long originalHeadphonesTime = 0;
 
     @Nullable private Boolean isHeadphonesMobile;

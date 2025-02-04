@@ -1,6 +1,7 @@
 package com.fazziclay.fclaybackend.person.status;
 
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -8,20 +9,21 @@ import java.util.Objects;
  * For only one song, if plays another song => resets
  */
 public class SongTime {
-    private SongInfo latestSongInfo;
-    private PlaybackDto latestSongPlayback;
+    @Nullable("Only on app start") private SongInfo latestSongInfo;
+    @Nullable("Only on app start") private PlaybackDto latestSongPlayback;
     private long appendix;
     private long startListening;
     private long endListening;
 
     public void postSongInfo(PlaybackDto playbackDto) {
-        var songInfo = SongInfo.create(latestSongPlayback = playbackDto);
+        var songInfo = SongInfo.create(playbackDto);
         if (songInfo == null) {
             if (!isPaused() && latestSongInfo != null) {
                 endListening = System.currentTimeMillis();
             }
             return;
         }
+        latestSongPlayback = playbackDto;
 
         if (!Objects.equals(latestSongInfo, songInfo)) {
             latestSongInfo = songInfo;
@@ -49,6 +51,9 @@ public class SongTime {
 
     public float getPlaysCount() {
         if (!isPresent()) {
+            return -1;
+        }
+        if (latestSongPlayback == null) {
             return -1;
         }
         var songDuration = latestSongPlayback.getDuration();

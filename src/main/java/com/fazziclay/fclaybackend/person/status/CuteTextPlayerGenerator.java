@@ -28,10 +28,11 @@ public class CuteTextPlayerGenerator {
         }
         var plays = status.getOnRepeatPlaysCount();
         if (plays > 1) {
-            var full = Math.floor(plays) + 1;
+            int full = (int) (Math.floor(plays) + 1);
             msg.append(full).append(" раз подряд").append("\n");
         }
-        msg.append("↻      ◁ II ▷     ↺");
+        var st = status.getHeadphones() == null ? "▶" : "II";
+        msg.append("↻      ◁ ").append(st).append(" ▷     ↺");
 
         return msg.toString();
     }
