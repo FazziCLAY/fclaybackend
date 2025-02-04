@@ -167,12 +167,6 @@ public class UserHandler implements Destroy {
         // dp nothing
     }
 
-    public void deleteMoodText(String authorization) {
-        checkModifyPermission(authorization);
-        status.setMoodText(null);
-        status.setRandom("Mood cleared " + hashCode());
-    }
-
     @SneakyThrows
     public PersonStatus patchPersonStatus(String authorization, Map<String, Object> updates) {
         checkModifyPermission(authorization);

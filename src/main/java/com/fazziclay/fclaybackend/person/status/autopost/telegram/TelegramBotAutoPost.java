@@ -17,6 +17,7 @@ import java.util.Objects;
 public class TelegramBotAutoPost implements IAutoPost {
     private final TelegramBot api;
     private final String chatId;
+
     private SongInfo headPlayback;
     private Integer headMessageId;
     private boolean headIsNothing; // prevent edit on program first call after restart
@@ -33,40 +34,36 @@ public class TelegramBotAutoPost implements IAutoPost {
         if (playback == null && headIsNothing) {
             return;
         }
-        boolean edit = headIsNothing || Objects.equals(songInfo, headPlayback);
-        String message = "UwU...";
-        if (playback == null) {
-            newHead("Nothing...");
-
-        } else {
-            message = CuteTextPlayerGenerator.v1(status, "✨");
+        if (playback != null) {
+            boolean edit = Objects.equals(songInfo, headPlayback);
+            String message = CuteTextPlayerGenerator.v1(status, "✨");
             postHead(edit, message);
         }
         headPlayback = songInfo;
         headIsNothing = songInfo == null;
     }
 
-    public void postHead(boolean edit, String message) {
+    public Integer postHead(boolean edit, String message) {
         if (edit) {
-            editHead(message);
+            return editHead(message);
         } else {
-            newHead(message);
+            return newHead(message);
         }
     }
 
-    public void newHead(String message) {
+    public Integer newHead(String message) {
         SendResponse sendResponse = api.execute(new SendMessage(this.chatId, message));
-        headMessageId = sendResponse.message().messageId();
+        return headMessageId = sendResponse.message().messageId();
     }
 
-    public void editHead(String message) {
+    public Integer editHead(String message) {
         if (headMessageId <= 0) {
-            newHead(message);
-            return;
+            return newHead(message);
         }
         BaseResponse sendResponse = api.execute(new EditMessageText(this.chatId, this.headMessageId, message));
         if (!sendResponse.isOk()) {
-            newHead(message);
+            return newHead(message);
         }
+        return this.headMessageId;
     }
 }

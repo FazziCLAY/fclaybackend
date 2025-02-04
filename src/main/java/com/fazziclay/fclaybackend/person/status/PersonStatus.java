@@ -20,7 +20,10 @@ public class PersonStatus {
             "customStatus"
     );
 
+    private transient SongTime songTime = new SongTime();
     @Nullable private PlaybackDto headphones;
+    private long onRepeatListeningTime;
+    private float onRepeatPlaysCount;
     @Nullable private String moodText;
     @Nullable private String customStatus;
 
@@ -36,6 +39,7 @@ public class PersonStatus {
     public void setOriginalHeadphones(PlaybackDto originalHeadphones, long latestUpdated) {
         this.originalHeadphones = originalHeadphones;
         this.originalHeadphonesTime = latestUpdated;
+        this.songTime.postSongInfo(originalHeadphones);
         actualizeHeadphones();
     }
 
@@ -62,6 +66,8 @@ public class PersonStatus {
                 //Logger.debug("actualizePersonStatus f*** math check: pos=" + position + "; overdue=" + overdue + "; nw=" + nw);
             }
         }
+        onRepeatListeningTime = this.songTime.getListeningDuration();
+        onRepeatPlaysCount = this.songTime.getPlaysCount();
 
         setHeadphones(actual);
     }

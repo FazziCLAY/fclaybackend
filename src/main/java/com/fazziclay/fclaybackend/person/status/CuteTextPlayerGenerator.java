@@ -21,12 +21,17 @@ public class CuteTextPlayerGenerator {
             var vlm = new StringBuilder();
             for (int i = 1; i < 9; i++) {
                 float p = ((float)i) * 10f;
-                String chr = p > (playback.getVolume()*100f) ? "▯" : "▮";
+                String chr = p > (playback.getVolume()*100f) ? "□" : "■";
                 vlm.append(chr);
             }
             msg.append("ᴠᴏʟᴜᴍᴇ  : ").append(vlm).append("\n");
         }
-        msg.append("↠ⁿᵉˣᵗ ˢᵒⁿᵍ ↺ ʳᵉᵖᵉᵃᵗ ⊜ ᵖᵃᵘˢᵉ");
+        var plays = status.getOnRepeatPlaysCount();
+        if (plays > 1) {
+            var full = Math.floor(plays) + 1;
+            msg.append(full).append(" раз подряд").append("\n");
+        }
+        msg.append("↻      ◁ II ▷     ↺");
 
         return msg.toString();
     }
