@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 @RestController
@@ -19,8 +20,16 @@ public class PersonStatusController {
     // get root
     @GetMapping
     public ResponseEntity<?> read(@PathVariable(value = "person_name", required = false) String personName,
-                                  @RequestHeader(value = "Authorization", required = false) String authorization) {
-        return handle(() -> service.getActualPersonStatus(personName, authorization), HttpStatus.OK);
+                                  @RequestHeader(value = "Authorization", required = false) String authorization,
+                                  @RequestParam(required = false) String fields) {
+        return handle(() -> service.getActualPersonStatusFiltered(personName, authorization, fields), HttpStatus.OK);
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> updatePersonStatus(@PathVariable(value = "person_name", required = false) String personName,
+                                                           @RequestHeader(value = "Authorization", required = false) String authorization,
+                                                           @RequestBody Map<String, Object> updates) {
+        return handle(() -> service.patchPersonStatus(personName, authorization, updates), HttpStatus.OK);
     }
 
 
@@ -37,33 +46,26 @@ public class PersonStatusController {
         }, HttpStatus.OK);
     }
 
-    // get chartjs
-    @GetMapping("/chartjs")
-    public ResponseEntity<?> chartjs(@PathVariable(value = "person_name", required = false) String personName,
-                                     @RequestHeader(value = "Authorization", required = false) String authorization) {
-        return handle(() -> service.getStatistic(personName, authorization).asJsonObject(), HttpStatus.OK);
-    }
-
     // PUT headphones
     @PutMapping("/headphones")
-    public ResponseEntity<?> put(@PathVariable(value = "person_name", required = false) String personName,
-                                 @RequestHeader(value = "Authorization", required = false) String authorization,
-                                 @RequestBody PlaybackDto status) {
+    public ResponseEntity<?> putHeadphones(@PathVariable(value = "person_name", required = false) String personName,
+                                           @RequestHeader(value = "Authorization", required = false) String authorization,
+                                           @RequestBody PlaybackDto status) {
         return handle(() -> service.putHeadphones(personName, authorization, status), HttpStatus.OK);
     }
 
     // PATCH headphones
     @PatchMapping("/headphones")
-    public ResponseEntity<?> patch(@PathVariable(value = "person_name", required = false) String personName,
-                                   @RequestHeader(value = "Authorization", required = false) String authorization,
-                                   @RequestBody PlaybackDto status) {
+    public ResponseEntity<?> patchHeadphones(@PathVariable(value = "person_name", required = false) String personName,
+                                             @RequestHeader(value = "Authorization", required = false) String authorization,
+                                             @RequestBody PlaybackDto status) {
         return handle(() -> service.patchHeadphones(personName, authorization, status), HttpStatus.OK);
     }
 
     // DELETE headphones
     @DeleteMapping("/headphones")
-    public ResponseEntity<?> delete(@PathVariable(value = "person_name", required = false) String personName,
-                                    @RequestHeader(value = "Authorization", required = false) String authorization) {
+    public ResponseEntity<?> deleteHeadphones(@PathVariable(value = "person_name", required = false) String personName,
+                                              @RequestHeader(value = "Authorization", required = false) String authorization) {
         return handle(() -> service.putHeadphones(personName, authorization, null), HttpStatus.NO_CONTENT);
     }
 

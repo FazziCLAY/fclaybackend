@@ -1,5 +1,6 @@
 package com.fazziclay.fclaybackend.person.status;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,23 +8,28 @@ import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
 @ToString
-
+@JsonFilter("DynamicFilter")
 public class PersonStatus {
-    @Nullable
-    private PlaybackDto headphones;
+    public static final Set<String> ALLOWED_TO_MODIFY_DIRECTLY = Set.of(
+            "moodText",
+            "customStatus"
+    );
 
-    private transient PlaybackDto originalHeadphones;
+    @Nullable private PlaybackDto headphones;
+    @Nullable private String moodText;
+    @Nullable private String customStatus;
+
+    @Nullable private transient PlaybackDto originalHeadphones;
     private long originalHeadphonesTime = 0;
 
-    @Nullable
-    private Boolean isMobile;
+    @Nullable private Boolean isHeadphonesMobile;
 
-    @Nullable
-    private String deviceName;
+    @Nullable private String headphonesDeviceName;
 
     private String random;
 
@@ -36,13 +42,14 @@ public class PersonStatus {
     public void clear() {
         setOriginalHeadphones(null, -1);
 
-        isMobile = null;
-        deviceName = null;
+        isHeadphonesMobile = null;
+        headphonesDeviceName = null;
         random = new Date().toString();
     }
 
     /**
-     * Call before return it object to API endpoint
+     * Call before return this object to API endpoint
+     * It recalc times in song
      */
     public void actualizeHeadphones() {
         PlaybackDto actual = originalHeadphones;

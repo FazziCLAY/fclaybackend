@@ -51,7 +51,7 @@ public class OVKApiAutoPost extends AutoPostFilter {
     public void sendMessageAbout(PersonStatus status) {
         PlaybackDto playback = status.getHeadphones();
         if (playback != null) {
-            setStatus(String.format("[%s] Listening in %s:%s: %s - %s", new Date(), status.getDeviceName(), playback.getPlayer(), playback.getTitle(), playback.getArtist()));
+            setStatus(String.format("[%s] Listening in %s:%s: %s - %s", new Date(), status.getHeadphonesDeviceName(), playback.getPlayer(), playback.getTitle(), playback.getArtist()));
         } else {
             setStatus(String.format("[%s] Currently music is paused.", new Date()));
         }

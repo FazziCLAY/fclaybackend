@@ -3,7 +3,6 @@ package com.fazziclay.fclaybackend.person.status.service;
 import com.fazziclay.fclaybackend.Destroy;
 import com.fazziclay.fclaybackend.FclayConfig;
 import com.fazziclay.fclaybackend.person.status.PersonStatus;
-import com.fazziclay.fclaybackend.person.status.Statistic;
 import com.fazziclay.fclaybackend.states.PersonsStatusConfig;
 import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 import lombok.Getter;
@@ -12,9 +11,11 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -71,8 +72,14 @@ public class PersonsStatusService {
 
 
     // ============= API =================
+    public MappingJacksonValue getActualPersonStatusFiltered(@Nullable String personName,
+                                                             @Nullable String authorization,
+                                                             @Nullable String fields) {
+        return getUser(personName).getActualPersonStatusFiltered(authorization, fields);
+    }
+
     public PersonStatus getActualPersonStatus(@Nullable String personName,
-                                              @Nullable String authorization) {
+                                                     @Nullable String authorization) {
         return getUser(personName).getActualPersonStatus(authorization);
     }
 
@@ -92,9 +99,8 @@ public class PersonsStatusService {
         return getUser(personName).patchHeadphones(authorization, patch);
     }
 
-
-    public Statistic getStatistic(@Nullable String personName,
-                                  @Nullable String authorization) {
-        return getUser(personName).getStatistic(authorization);
+    @SneakyThrows
+    public PersonStatus patchPersonStatus(String personName, String authorization, Map<String, Object> updates) {
+        return getUser(personName).patchPersonStatus(authorization, updates);
     }
 }

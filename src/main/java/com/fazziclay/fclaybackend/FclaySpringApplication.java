@@ -1,6 +1,5 @@
 package com.fazziclay.fclaybackend;
 
-import com.google.gson.JsonObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatusCode;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,14 +26,14 @@ public class FclaySpringApplication {
 
 	@GetMapping("/")
 	public ResponseEntity<?> hello(@RequestHeader("X-Real-IP") String requestIp) {
-		var map = new JsonObject();
-		map.addProperty("hello", "Hello my dear user! Spring application is work correctly!");
-		map.addProperty("java", "This message sent from Spring Boot (java)");
-		map.addProperty("date", String.valueOf(new Date()));
-		map.addProperty("yourIp", requestIp);
-		map.addProperty("random", String.valueOf(new Random().nextInt()));
-		map.addProperty("counter", String.valueOf(counter.incrementAndGet()));
-		map.addProperty("uptime", String.valueOf(System.currentTimeMillis() - startTime));
+		var map = new HashMap<String, String>();
+		map.put("hello", "Hello my dear user! Spring application is work correctly!");
+		map.put("java", "This message sent from Spring Boot (java)");
+		map.put("date", String.valueOf(new Date()));
+		map.put("yourIp", requestIp);
+		map.put("random", String.valueOf(new Random().nextInt()));
+		map.put("counter", String.valueOf(counter.incrementAndGet()));
+		map.put("uptime", String.valueOf(System.currentTimeMillis() - startTime));
 		return new ResponseEntity<>(map, HttpStatusCode.valueOf(200));
 	}
 
