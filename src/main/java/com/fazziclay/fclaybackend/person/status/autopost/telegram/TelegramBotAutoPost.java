@@ -21,6 +21,8 @@ public class TelegramBotAutoPost implements IAutoPost {
     private SongInfo headPlayback;
     private Integer headMessageId;
     private boolean headIsNothing; // prevent edit on program first call after restart
+    private long latestTg = 0;
+    private int headHashCode = 0;
 
     public TelegramBotAutoPost(String token, String chatId) {
         this.chatId = chatId;
@@ -37,6 +39,8 @@ public class TelegramBotAutoPost implements IAutoPost {
         if (playback != null) {
             boolean edit = Objects.equals(songInfo, headPlayback);
             String message = CuteTextPlayerGenerator.v1(status, "✨");
+            if (System.currentTimeMillis() - latestTg < 10000 || message.hashCode() == headHashCode) return;
+            headHashCode = message.hashCode();
             postHead(edit, message);
         }
         headPlayback = songInfo;
@@ -44,6 +48,7 @@ public class TelegramBotAutoPost implements IAutoPost {
     }
 
     public Integer postHead(boolean edit, String message) {
+        latestTg = System.currentTimeMillis();
         if (edit) {
             return editHead(message);
         } else {

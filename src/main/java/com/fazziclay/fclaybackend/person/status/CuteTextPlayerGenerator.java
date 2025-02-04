@@ -6,7 +6,7 @@ import com.fazziclay.fclaysystem.personstatus.api.dto.PlaybackDto;
 public class CuteTextPlayerGenerator {
     public static String v1(PersonStatus status, String emoji) {
         PlaybackDto playback = status.getHeadphones();
-        if (playback == null) return null;
+        if (playback == null) return "Ops..";
         Long duration = playback.getDuration();
         Long position = playback.getPosition();
 
