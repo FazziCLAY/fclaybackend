@@ -114,14 +114,14 @@ public class UserHandler implements Destroy {
     private void checkGetPermission(@Nullable String authorization) {
         if (this.accessToken != null) {
             if (!Objects.equals(this.accessToken, authorization)) {
-                throw new HttpException("This user need authentication for get.", HttpStatus.UNAUTHORIZED);
+                throw new HttpException(HttpStatus.UNAUTHORIZED, "This user need authentication for get.");
             }
         }
     }
 
     // device
     public PlaybackDto putHeadphones(@Nullable String authorization, PlaybackDto status) {
-        var handler = getDeviceHandler(authorization).orElseThrow(() -> new HttpException("no device found", HttpStatus.UNAUTHORIZED));
+        var handler = getDeviceHandler(authorization).orElseThrow(() -> new HttpException(HttpStatus.UNAUTHORIZED, "no device found"));
         handler.putHeadphones(status);
         onDeviceUpdated(handler);
 
@@ -130,7 +130,7 @@ public class UserHandler implements Destroy {
 
     // device
     public PlaybackDto patchHeadphones(String authorization, PlaybackDto patch) {
-        var handler = getDeviceHandler(authorization).orElseThrow(() -> new HttpException("no device found", HttpStatus.UNAUTHORIZED));
+        var handler = getDeviceHandler(authorization).orElseThrow(() -> new HttpException(HttpStatus.UNAUTHORIZED, "no device found"));
 
         PlaybackDto patchedSong = handler.getSong().newWithPatch(patch);
 
