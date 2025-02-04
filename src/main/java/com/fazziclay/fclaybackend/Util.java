@@ -1,6 +1,7 @@
 package com.fazziclay.fclaybackend;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -10,9 +11,18 @@ import java.util.function.Supplier;
 public class Util {
     public static String time(Long millis) {
         if (millis == null) return null;
-        long s = millis / 1000;
-        return String.format("%d:%02d", s/60, s%60);
+        long totalSeconds = millis / 1000;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        if (hours > 0) {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        } else {
+            return String.format("%02d:%02d", minutes, seconds);
+        }
     }
+
 
     public static <T> ResponseEntity<?> handleError(Supplier<T> supplier, HttpStatus success) {
         try {
@@ -24,16 +34,20 @@ public class Util {
             if (throwable instanceof HttpException httpException) {
                 httpStatus = httpException.getCode();
             }
-            JsonObject response = new JsonObject();
+            ObjectMapper objectMapper = new ObjectMapper();
 
-            JsonObject error = new JsonObject();
-            error.addProperty("text", "An error occurred");
-            error.addProperty("exception", throwable.toString());
-            error.addProperty("httpErrorCode", httpStatus.value());
-            error.addProperty("httpErrorPhrase", httpStatus.getReasonPhrase());
-            error.addProperty("date", String.valueOf(new Date()));
+            // Создаём JSON-объект для ошибки
+            ObjectNode error = objectMapper.createObjectNode();
+            error.put("text", "An error occurred");
+            error.put("exception", throwable.toString());
+            error.put("httpErrorCode", httpStatus.value());
+            error.put("httpErrorPhrase", httpStatus.getReasonPhrase());
+            error.put("date", new Date().toString());
 
-            response.add("error", error);
+            // Заворачиваем в основной объект (если он нужен)
+            ObjectNode response = objectMapper.createObjectNode();
+            response.set("error", error);
+
             return new ResponseEntity<>(response, httpStatus);
         }
     }

@@ -60,7 +60,7 @@ public class DeviceUserHandler {
 
     public void updatePersonStatus(PersonStatus status) {
         status.setOriginalHeadphones(song, latestUpdated);
-        status.setIsMobile(isMobile);
-        status.setDeviceName(name);
+        status.setIsHeadphonesMobile(isMobile);
+        status.setHeadphonesDeviceName(name);
     }
 }
